@@ -14,7 +14,7 @@ from pathlib import Path
 import os
 import dj_database_url  # Added
 from dotenv import load_dotenv
-import yaml  # Added
+# import yaml  # Removed: No longer using config.yaml
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,45 +22,35 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables from .env file
 load_dotenv(BASE_DIR / '.env')  # Added
 
-# --- Load configuration from config.yaml ---
-CONFIG_FILE_PATH = Path(__file__).resolve().parent / 'config.yaml'
-APP_CONFIG = {}
-if CONFIG_FILE_PATH.exists():
-    try:
-        with open(CONFIG_FILE_PATH, 'r') as f:
-            APP_CONFIG = yaml.safe_load(f)
-            if APP_CONFIG is None:  # Handle empty YAML file
-                APP_CONFIG = {}
-    except FileNotFoundError:
-        print(
-            f"Warning: Configuration file {CONFIG_FILE_PATH} not found. Using default settings.")
-    except yaml.YAMLError as e:
-        print(
-            f"Error parsing {CONFIG_FILE_PATH}: {e}. Using default settings.")
-else:
-    print(
-        f"Warning: Configuration file {CONFIG_FILE_PATH} not found. Using default settings.")
-
-# Extract specific configurations with defaults
-APP_MODE = APP_CONFIG.get('mode')
+# --- Configuration from Environment Variables ---
+# APP_MODE is now directly loaded from .env
+APP_MODE = os.getenv('APP_MODE')
 if not APP_MODE:
-    raise ValueError(
-        "'mode' must be set in config.yaml (e.g., 'development' or 'production').")
-elif APP_MODE not in ['development', 'production']:
+    # Fallback or raise error if APP_MODE is critical and not set
+    # For now, let's assume it might be set by the environment directly
+    # or we can provide a default if .env is missing the entry.
+    # If it's absolutely required from .env, you might raise an error here.
+    print("Warning: APP_MODE not found in .env. Defaulting to 'development'.")
+    APP_MODE = 'development' # Defaulting to development if not set
+    # If critical, uncomment below:
+    # raise ValueError("APP_MODE must be set in the .env file (e.g., 'development' or 'production').")
+
+if APP_MODE not in ['development', 'production']:
     raise ValueError(
         f"Invalid APP_MODE '{APP_MODE}'. Must be 'development' or 'production'.")
-GEMINI_MODEL_NAME_FROM_CONFIG = APP_CONFIG.get('gemini', {}).get(
-    'model_name', 'gemini-1.0-pro')  # Default model
-# --- End Load configuration from config.yaml ---
+
+# GEMINI_MODEL_NAME is now directly loaded from .env
+GEMINI_MODEL_NAME = os.getenv('GEMINI_MODEL_NAME', 'gemini-1.0-pro') # Default model if not in .env
+# --- End Configuration from Environment Variables ---
 
 # Gemini API Key (from .env)
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')  # Added
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 if not GEMINI_API_KEY:
     print("Warning: GEMINI_API_KEY not found in environment variables.")
     # Consider: raise ImproperlyConfigured("GEMINI_API_KEY must be set in environment variables.")
 
-# Gemini Model Name (from config.yaml)
-GEMINI_MODEL_NAME = GEMINI_MODEL_NAME_FROM_CONFIG
+# Gemini Model Name (now directly from .env, already assigned above)
+# GEMINI_MODEL_NAME = GEMINI_MODEL_NAME_FROM_CONFIG # This line is removed as GEMINI_MODEL_NAME is set from os.getenv
 
 
 # Quick-start development settings - unsuitable for production
