@@ -1,0 +1,55 @@
+# Environment variables
+.env
+local_settings.py # For local-specific settings not to be committed
+
+# Secrets
+# client_secrets.json # Uncomment if you download OAuth client secrets as a file
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django specific
+db.sqlite3
+db.sqlite3-journal 
+media/          
+static_root/    
+staticfiles/    
+
+# Log files
+*.log        
+logs/          
+
+# OS generated files
+.DS_Store       # macOS
+Thumbs.db       # Windows
+._*             # macOS
+.Spotlight-V100 # macOS
+.Trashes        # macOS
+
+# IDE and editor configuration
+.idea/          # JetBrains IDEs (PyCharm, IntelliJ)
+.vscode/        # Visual Studio Code
+*.swp           # Vim swap files
+*.swo           # Vim swap files
+
+# Coverage reports
+.coverage
+.coverage.*
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Instance folder
+instance/

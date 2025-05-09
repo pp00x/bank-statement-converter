@@ -1,0 +1,7 @@
+# Application runtime mode: 'development' or 'production'
+mode: development
+
+# Gemini AI model configuration
+gemini:
+  # Specifies the model to be used by the application
+  model_name: gemini-2.0-flash-lite
