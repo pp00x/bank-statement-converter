@@ -133,6 +133,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'converter_app.middleware.RequestIdMiddleware',  # Added RequestIdMiddleware
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -221,6 +222,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Additional locations of static files (e.g., a project-level 'static' folder)
 # Django will look for static files in these directories in addition to app-specific 'static' folders.
 STATICFILES_DIRS = []
+
+# Whitenoise configuration for serving static files in production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Logging Configuration
 # ------------------------------------------------------------------------------
