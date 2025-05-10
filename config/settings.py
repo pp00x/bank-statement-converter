@@ -226,9 +226,10 @@ STATICFILES_DIRS = [
 
 # Logging Configuration
 # ------------------------------------------------------------------------------
-LOG_DIR = BASE_DIR / 'logs'
-os.makedirs(LOG_DIR, exist_ok=True)
+# Logging Configuration
+# ------------------------------------------------------------------------------
 
+# Base LOGGING config (for production / console-only)
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -236,57 +237,66 @@ LOGGING = {
         'json_formatter': {
             '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
             'format': '%(asctime)s %(levelname)s %(name)s %(module)s %(funcName)s %(lineno)d %(message)s %(request_id)s'
-            # Add other standard fields if needed. request_id will be added via 'extra'.
         },
         'simple_console_formatter': {
-            '()': 'django.utils.log.ServerFormatter',  # Standard Django formatter
+            '()': 'django.utils.log.ServerFormatter',
             'format': '[{asctime}] {levelname} {module}.{funcName}: {message}',
             'style': '{',
         },
     },
     'handlers': {
-        'console_dev': {  # For development, human-readable
+        'console_json': {  # For production console (Vercel)
             'class': 'logging.StreamHandler',
-            'level': 'DEBUG',
-            'formatter': 'simple_console_formatter',
-        },
-        'console_json': {  # For production console or if JSON is preferred in dev console
-            'class': 'logging.StreamHandler',
-            'level': 'INFO',  # Default to INFO for this handler
+            'level': 'INFO',
             'formatter': 'json_formatter',
         },
-        'rotating_file_json': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'level': 'DEBUG',  # Logger level will ultimately control what's written
-            'formatter': 'json_formatter',
-            'filename': LOG_DIR / 'app.log.json',
-            'maxBytes': 10 * 1024 * 1024,  # 10MB
-            'backupCount': 5,
-        },
+        # 'console_dev' and 'rotating_file_json' will be added if DEBUG is True
     },
     'loggers': {
         'django': {
-            'handlers': ['console_dev' if DEBUG else 'console_json', 'rotating_file_json'],
+            'handlers': ['console_json'],
             'level': 'INFO',
             'propagate': False,
         },
         'django.request': {
-            'handlers': ['console_dev' if DEBUG else 'console_json', 'rotating_file_json'],
+            'handlers': ['console_json'],
             'level': 'ERROR',
             'propagate': False,
         },
         'converter_app': {  # Your application logger
-            'handlers': ['console_dev' if DEBUG else 'console_json', 'rotating_file_json'],
-            'level': 'DEBUG' if DEBUG else 'INFO',
+            'handlers': ['console_json'],
+            'level': 'INFO', # Default to INFO for app in production
             'propagate': False,
         },
-        # Example of a root logger configuration if needed
-        # 'root': {
-        #     'handlers': ['console_dev' if DEBUG else 'console_json', 'rotating_file_json'],
-        #     'level': 'INFO',
-        # },
     },
 }
+
+if DEBUG:
+    LOG_DIR = BASE_DIR / 'logs'
+    os.makedirs(LOG_DIR, exist_ok=True) # Create log directory only in development
+
+    # Add development-specific handlers
+    LOGGING['handlers']['console_dev'] = {
+        'class': 'logging.StreamHandler',
+        'level': 'DEBUG',
+        'formatter': 'simple_console_formatter',
+    }
+    LOGGING['handlers']['rotating_file_json'] = {
+        'class': 'logging.handlers.RotatingFileHandler',
+        'level': 'DEBUG',
+        'formatter': 'json_formatter',
+        'filename': LOG_DIR / 'app.log.json',
+        'maxBytes': 10 * 1024 * 1024,  # 10MB
+        'backupCount': 5,
+    }
+
+    # Update loggers to use development handlers
+    LOGGING['loggers']['django']['handlers'] = ['console_dev', 'rotating_file_json']
+    LOGGING['loggers']['django.request']['handlers'] = ['console_dev', 'rotating_file_json']
+    # Optionally make django.request more verbose in dev if needed
+    # LOGGING['loggers']['django.request']['level'] = 'DEBUG'
+    LOGGING['loggers']['converter_app']['handlers'] = ['console_dev', 'rotating_file_json']
+    LOGGING['loggers']['converter_app']['level'] = 'DEBUG'
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
