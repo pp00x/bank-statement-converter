@@ -674,12 +674,12 @@ def google_auth_callback(request):
             del os.environ['OAUTHLIB_INSECURE_TRANSPORT']
     # Removed duplicated and misplaced credential storage logic.
     # Correct logic for storing credentials in session is now within the try block above.
-    logger.info("google_auth_callback: Google authentication successful and credentials stored. Redirecting to upload_pdf.", extra={
-                'request_id': request_id})
-    # Redirect back to the main upload page (or a dedicated 'upload successful' page)
-    # Optionally add a success message here using Django messages framework
-    # Redirect back to the main page
-    return redirect(reverse('converter_app:upload_pdf'))
+    next_url = request.session.pop('google_auth_next_url', None)
+    redirect_target = next_url or reverse('converter_app:upload_pdf')
+    
+    logger.info(f"google_auth_callback: Google authentication successful. Credentials stored. Redirecting to: {redirect_target}", extra={
+                'request_id': request_id, 'redirect_target': redirect_target})
+    return redirect(redirect_target)
 
 # We will add the view to actually upload to sheets next
 
@@ -720,8 +720,9 @@ def upload_to_google_sheets_view(request):
         return redirect(reverse('converter_app:upload_pdf'))
 
     if not credentials_dict:
-        logger.info("upload_to_google_sheets_view: No Google credentials found in session. Redirecting to auth.",
-                    extra={'request_id': request_id})
+        logger.info("upload_to_google_sheets_view: No Google credentials found in session. Storing current path and redirecting to auth.",
+                    extra={'request_id': request_id, 'current_path': request.path})
+        request.session['google_auth_next_url'] = request.path # Store current path to return after auth
         return redirect(reverse('converter_app:google_auth_redirect'))
 
     try:
@@ -733,6 +734,7 @@ def upload_to_google_sheets_view(request):
             logger.warning("upload_to_google_sheets_view: Google API refresh token missing. Redirecting to auth.",
                            extra={'request_id': request_id})
             request.session['upload_message'] = "Google API refresh token is missing. Please re-authenticate."
+            request.session['google_auth_next_url'] = request.path # Store current path
             return redirect(reverse('converter_app:google_auth_redirect'))
 
         logger.debug("upload_to_google_sheets_view: Rebuilding Google Credentials object.", extra={
@@ -796,10 +798,12 @@ def upload_to_google_sheets_view(request):
                 except Exception as refresh_error:
                     logger.exception("upload_to_google_sheets_view: Failed to refresh Google credentials. Redirecting to auth.",
                                      extra={'request_id': request_id})
+                    request.session['google_auth_next_url'] = request.path # Store current path
                     return redirect(reverse('converter_app:google_auth_redirect'))
-            else:
+            else: # This else corresponds to 'if credentials.expired and all_fields_present_for_refresh:'
                 logger.warning("upload_to_google_sheets_view: Credentials not valid and cannot refresh (e.g. no refresh token). Redirecting to auth.",
                                extra={'request_id': request_id, 'expired': credentials.expired, 'has_refresh_token': bool(credentials.refresh_token)})
+                request.session['google_auth_next_url'] = request.path # Store current path
                 return redirect(reverse('converter_app:google_auth_redirect'))
         else:
             logger.debug("upload_to_google_sheets_view: Google credentials are valid.", extra={
