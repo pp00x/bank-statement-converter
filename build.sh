@@ -4,16 +4,16 @@
 echo "Collecting static files..."
 python manage.py collectstatic --noinput -v 3
 
-echo "--- Listing contents of new STATIC_ROOT (staticfiles/) after collectstatic ---"
-if [ -d "staticfiles/" ]; then
-  ls -R staticfiles/
+echo "--- Listing contents of new STATIC_ROOT (static/) after collectstatic ---"
+if [ -d "static/" ]; then
+  ls -R static/
 else
-  echo "Directory staticfiles/ does NOT exist."
+  echo "Directory static/ does NOT exist."
 fi
 echo "--- End of new STATIC_ROOT listing ---"
 
 echo "--- Checking for critical static files in new location ---"
-CRITICAL_STATIC_FILE="staticfiles/converter_app/script.js"
+CRITICAL_STATIC_FILE="static/converter_app/script.js"
 if [ -f "$CRITICAL_STATIC_FILE" ]; then
   echo "Found critical static file: $CRITICAL_STATIC_FILE"
 else
