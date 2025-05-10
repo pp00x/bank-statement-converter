@@ -218,6 +218,7 @@ STATIC_URL = 'static/'
 # Directory where Django's collectstatic will gather all static files for deployment.
 # This path should align with the 'distDir' configuration in vercel.json (or its subdirectories).
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+print(f"DEBUG: Calculated STATIC_ROOT at settings load: {STATIC_ROOT}") # Diagnostic print
 
 # Additional locations of static files (e.g., a project-level 'static' folder)
 # Django will look for static files in these directories in addition to app-specific 'static' folders.
@@ -225,6 +226,7 @@ STATICFILES_DIRS = []
 
 # Whitenoise configuration for serving static files in production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+WHITENOISE_STATIC_PREFIX = '/static/' # Be explicit, though usually derived
 
 # Logging Configuration
 # ------------------------------------------------------------------------------
