@@ -220,9 +220,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
 
 # Additional locations of static files (e.g., a project-level 'static' folder)
 # Django will look for static files in these directories in addition to app-specific 'static' folders.
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+STATICFILES_DIRS = []
 
 # Logging Configuration
 # ------------------------------------------------------------------------------
