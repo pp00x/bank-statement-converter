@@ -131,8 +131,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Moved to top as per article
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Standard placement
     'converter_app.middleware.RequestIdMiddleware',  # Added RequestIdMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -217,16 +217,15 @@ STATIC_URL = 'static/'
 
 # Directory where Django's collectstatic will gather all static files for deployment.
 # This path should align with the 'distDir' configuration in vercel.json (or its subdirectories).
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Changed to 'staticfiles'
-print(f"DEBUG: Calculated STATIC_ROOT at settings load: {STATIC_ROOT}") # Diagnostic print
+STATIC_ROOT = os.path.join(BASE_DIR, 'static') # Changed to 'static'
+# print(f"DEBUG: Calculated STATIC_ROOT at settings load: {STATIC_ROOT}") # Removed diagnostic print
 
 # Additional locations of static files (e.g., a project-level 'static' folder)
 # Django will look for static files in these directories in addition to app-specific 'static' folders.
 STATICFILES_DIRS = []
 
 # Whitenoise configuration for serving static files in production
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage' # Changed to non-manifest version
-# WHITENOISE_STATIC_PREFIX removed
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' # Reverted to Manifest version
 
 # Logging Configuration
 # ------------------------------------------------------------------------------

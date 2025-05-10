@@ -9,14 +9,10 @@
     {
       "src": "build.sh",
       "use": "@vercel/static-build",
-      "config": { "distDir": "staticfiles" }
+      "config": { "distDir": "static" }
     }
   ],
   "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
     {
       "src": "/(.*)",
       "dest": "config/wsgi.py"
