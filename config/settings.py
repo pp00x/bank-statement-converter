@@ -216,7 +216,7 @@ STATIC_URL = 'static/'
 
 # Directory where Django's collectstatic will gather all static files for deployment.
 # This path should align with the 'distDir' configuration in vercel.json (or its subdirectories).
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Additional locations of static files (e.g., a project-level 'static' folder)
 # Django will look for static files in these directories in addition to app-specific 'static' folders.
