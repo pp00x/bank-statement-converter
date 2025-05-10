@@ -325,15 +325,18 @@ def upload_pdf_view(request):
             request.session.pop('gsheet_url', None)
             request.session.pop('gsheet_title', None)
 
-            # Clear statement-specific data as the GSheet cycle for this PDF is complete
-            if 'statement_data_id' in request.session:
-                logger.info(f"upload_pdf_view: Clearing statement_data_id ({request.session.get('statement_data_id')}) after GSheet success display.", extra={
-                            'request_id': request_id})
-                request.session.pop('statement_data_id', None)
-            if 'date_range_string' in request.session:
-                logger.info(f"upload_pdf_view: Clearing date_range_string ({request.session.get('date_range_string')}) after GSheet success display.", extra={
-                            'request_id': request_id})
-                request.session.pop('date_range_string', None)
+            # # Clear statement-specific data as the GSheet cycle for this PDF is complete
+            # # MODIFIED: Do not clear statement_data_id and date_range_string here,
+            # # so that download options remain available for the same processed statement.
+            # # These are cleared when a new PDF is uploaded (see POST handling).
+            # if 'statement_data_id' in request.session:
+            #     logger.info(f"upload_pdf_view: (No longer clearing) statement_data_id ({request.session.get('statement_data_id')}) after GSheet success display.", extra={
+            #                 'request_id': request_id})
+            #     # request.session.pop('statement_data_id', None) # Keep for downloads
+            # if 'date_range_string' in request.session:
+            #     logger.info(f"upload_pdf_view: (No longer clearing) date_range_string ({request.session.get('date_range_string')}) after GSheet success display.", extra={
+            #                 'request_id': request_id})
+            #     # request.session.pop('date_range_string', None) # Keep for downloads
 
         elif _upload_message:  # No GSheet message, but there's a general message
             if "Error" in _upload_message:  # Simple check
